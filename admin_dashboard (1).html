@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Veda Tech Expo – Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #030712;
+    --surface: #0d1117;
+    --card: #111827;
+    --border: #1f2937;
+    --gold: #d4a843;
+    --gold2: #f0c060;
+    --amber: #f59e0b;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --success: #10b981;
+    --error: #ef4444;
+    --radius: 12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(212,168,67,0.08) 0%, transparent 70%);
+  }
+
+  .login-box {
+    background: var(--card);
+    border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .login-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--amber), var(--gold));
+  }
+
+  .login-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+  .login-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  .login-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+
+  .login-field { margin-bottom: 1rem; text-align: left; }
+  .login-field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+  .login-field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .login-field input:focus {
+    border-color: rgba(212,168,67,0.5);
+    box-shadow: 0 0 0 3px rgba(212,168,67,0.08);
+  }
+
+  .login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    color: #000;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .login-error {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+    display: none;
+  }
+
+  /* ── DASHBOARD ── */
+  #dashboard { display: none; }
+
+  /* Header */
+  .dash-header {
+    background: rgba(3,7,18,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(212,168,67,0.2);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .dash-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .dash-brand span { color: var(--muted); font-size: 0.8rem; font-family: 'Outfit', sans-serif; font-weight: 400; }
+
+  .header-right { display: flex; align-items: center; gap: 1rem; }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #ef4444;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { background: rgba(239,68,68,0.1); }
+
+  .btn-refresh {
+    background: rgba(212,168,67,0.1);
+    border: 1px solid rgba(212,168,67,0.3);
+    color: var(--gold);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .btn-refresh:hover { background: rgba(212,168,67,0.2); }
+
+  /* Main content */
+  .dash-main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+
+  /* Stats row */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .stat-card:hover { border-color: rgba(212,168,67,0.3); }
+
+  .stat-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .stat-num {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 220px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: rgba(212,168,67,0.4); }
+
+  .filter-select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .btn-export {
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    color: #000;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    padding: 0.6rem 1.4rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .btn-export:hover { opacity: 0.85; }
+
+  /* Table */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .table-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .table-count {
+    font-size: 0.8rem;
+    color: var(--muted);
+    background: var(--surface);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+  }
+
+  .table-scroll { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  thead th {
+    background: var(--surface);
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+  }
+  thead th:hover { color: var(--gold); }
+  thead th.sorted { color: var(--gold); }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(31,41,55,0.6);
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: rgba(212,168,67,0.04); }
+  tbody tr:last-child { border-bottom: none; }
+
+  tbody td {
+    padding: 0.85rem 1rem;
+    vertical-align: top;
+    color: var(--text);
+  }
+
+  .reg-id {
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    color: var(--gold);
+    background: rgba(212,168,67,0.08);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-members {
+    background: rgba(16,185,129,0.15);
+    color: #10b981;
+    border: 1px solid rgba(16,185,129,0.25);
+  }
+  .badge-domain {
+    background: rgba(212,168,67,0.1);
+    color: var(--gold2);
+    border: 1px solid rgba(212,168,67,0.2);
+    font-size: 0.68rem;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+  }
+
+  .member-list { list-style: none; }
+  .member-list li {
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding: 0.1rem 0;
+  }
+  .member-list li strong { color: var(--text); font-weight: 500; }
+
+  .td-name { font-weight: 600; }
+  .td-email { color: var(--muted); font-size: 0.8rem; }
+  .td-phone { color: var(--muted); font-size: 0.8rem; }
+
+  .payment-img {
+    display: inline-block;
+    background: rgba(16,185,129,0.12);
+    color: #10b981;
+    border: 1px solid rgba(16,185,129,0.25);
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .payment-img:hover { background: rgba(16,185,129,0.22); }
+  .no-payment {
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-style: italic;
+  }
+
+  .date-cell { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+
+  /* Loading & empty states */
+  .loading-state, .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+  }
+  .loading-spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(212,168,67,0.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-title { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--muted); }
+
+  /* Detail modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--amber), var(--gold));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    color: var(--muted);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+  .modal-reg-id {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: var(--gold);
+    background: rgba(212,168,67,0.08);
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+
+  .modal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .modal-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .modal-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .detail-item label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+  }
+  .detail-item span {
+    font-size: 0.9rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .member-card-name { font-weight: 600; font-size: 0.9rem; }
+  .member-card-details { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+  .btn-view {
+    background: transparent;
+    border: 1px solid rgba(212,168,67,0.3);
+    color: var(--gold);
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-view:hover { background: rgba(212,168,67,0.1); }
+
+  @media (max-width: 768px) {
+    .dash-main { padding: 1rem; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <div class="login-title">Admin Access</div>
+    <p class="login-sub">Veda Tech Expo 2026 · Dashboard</p>
+
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="passwordInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter') doLogin()"/>
+    </div>
+
+    <button class="login-btn" onclick="doLogin()">Access Dashboard</button>
+    <div class="login-error" id="loginError">❌ Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="dash-brand">
+      ✦ Veda Tech Expo
+      <span>/ Admin Dashboard</span>
+    </div>
+    <div class="header-right">
+      <button class="btn-refresh" onclick="loadRegistrations()">↻ Refresh</button>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="dash-main">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-num" id="statTeams">—</div>
+        <div class="stat-label">Total Teams</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-num" id="statStudents">—</div>
+        <div class="stat-label">Total Students</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏫</div>
+        <div class="stat-num" id="statColleges">—</div>
+        <div class="stat-label">Colleges</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💳</div>
+        <div class="stat-num" id="statPayments">—</div>
+        <div class="stat-label">Payments Received</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <input class="search-box" type="text" id="searchBox" placeholder="🔍  Search by team, name, email, college..." oninput="filterTable()"/>
+      <select class="filter-select" id="domainFilter" onchange="filterTable()">
+        <option value="">All Domains</option>
+      </select>
+      <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="table-title">📋 Registered Teams</div>
+        <div class="table-count" id="tableCount">Loading…</div>
+      </div>
+
+      <div id="loadingState" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Fetching registrations from Firebase…</p>
+      </div>
+
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">No registrations found</div>
+        <p style="margin-top:0.5rem;font-size:0.85rem;">Try adjusting your search or check back later.</p>
+      </div>
+
+      <div class="table-scroll" id="tableWrap" style="display:none;">
+        <table id="regTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable('regId')">Reg ID</th>
+              <th onclick="sortTable('teamName')">Team Name</th>
+              <th onclick="sortTable('projectTitle')">Project Title</th>
+              <th onclick="sortTable('domain')">Domain</th>
+              <th onclick="sortTable('college')">College</th>
+              <th onclick="sortTable('leader.name')">Leader</th>
+              <th onclick="sortTable('totalMembers')">Members</th>
+              <th onclick="sortTable('transactionId')">Txn ID</th>
+              <th onclick="sortTable('registeredAt')">Registered On</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, orderBy, query }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── YOUR FIREBASE CONFIG ──
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCj3yoH158F9ccKifk1YNWtWGR3-RMt4mM",
+    authDomain:        "veda-tech-expo.firebaseapp.com",
+    projectId:         "veda-tech-expo",
+    storageBucket:     "veda-tech-expo.firebasestorage.app",
+    messagingSenderId: "886687406511",
+    appId:             "1:886687406511:web:4572649c3d7198145b375a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── ADMIN PASSWORD (change this!) ──
+  const ADMIN_PASSWORD = "VedaAdmin2026";
+
+  let allRegistrations = [];
+  let sortKey = 'registeredAt';
+  let sortAsc = false;
+
+  // LOGIN
+  window.doLogin = function() {
+    const pw = document.getElementById('passwordInput').value;
+    if (pw === ADMIN_PASSWORD) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadRegistrations();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
+    }
+  };
+
+  window.doLogout = function() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('loginError').style.display = 'none';
+  };
+
+  // LOAD DATA
+  window.loadRegistrations = async function() {
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('tableWrap').style.display  = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('tableCount').textContent = 'Loading…';
+
+    try {
+      const q = query(collection(db, 'registrations'), orderBy('registeredAt', 'desc'));
+      const snapshot = await getDocs(q);
+      allRegistrations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      populateDomainFilter();
+      renderTable(allRegistrations);
+      updateStats(allRegistrations);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('loadingState').innerHTML =
+        `<div class="empty-icon">⚠️</div><p style="color:#ef4444">Error loading data: ${err.message}</p>`;
+    }
+  };
+
+  function populateDomainFilter() {
+    const domains = [...new Set(allRegistrations.map(r => r.domain).filter(Boolean))].sort();
+    const sel = document.getElementById('domainFilter');
+    sel.innerHTML = '<option value="">All Domains</option>' +
+      domains.map(d => `<option value="${d}">${d}</option>`).join('');
+  }
+
+  function updateStats(regs) {
+    document.getElementById('statTeams').textContent    = regs.length;
+    const totalStudents = regs.reduce((acc, r) => acc + (r.totalMembers || 0), 0);
+    document.getElementById('statStudents').textContent = totalStudents;
+    const colleges = new Set(regs.map(r => r.college).filter(Boolean));
+    document.getElementById('statColleges').textContent = colleges.size;
+    const paid = regs.filter(r => r.transactionId || r.paymentImageUrl).length;
+    document.getElementById('statPayments').textContent = paid;
+  }
+
+  // FILTER
+  window.filterTable = function() {
+    const q      = document.getElementById('searchBox').value.toLowerCase();
+    const domain = document.getElementById('domainFilter').value;
+    const filtered = allRegistrations.filter(r => {
+      const matchSearch = !q || [
+        r.teamName, r.projectTitle, r.college, r.department,
+        r.leader?.name, r.leader?.email, r.regId,
+        ...(r.members || []).map(m => m.name + ' ' + m.email)
+      ].some(v => v && v.toLowerCase().includes(q));
+      const matchDomain = !domain || r.domain === domain;
+      return matchSearch && matchDomain;
+    });
+    renderTable(filtered);
+  };
+
+  // SORT
+  window.sortTable = function(key) {
+    if (sortKey === key) sortAsc = !sortAsc;
+    else { sortKey = key; sortAsc = true; }
+    document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+    filterTable();
+  };
+
+  function getVal(obj, key) {
+    return key.split('.').reduce((o, k) => o?.[k], obj) ?? '';
+  }
+
+  // RENDER TABLE
+  function renderTable(regs) {
+    document.getElementById('loadingState').style.display = 'none';
+
+    // Sort
+    const sorted = [...regs].sort((a, b) => {
+      const av = getVal(a, sortKey), bv = getVal(b, sortKey);
+      return sortAsc ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1);
+    });
+
+    if (sorted.length === 0) {
+      document.getElementById('tableWrap').style.display  = 'none';
+      document.getElementById('emptyState').style.display = 'block';
+      document.getElementById('tableCount').textContent = '0 registrations';
+      return;
+    }
+
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('tableWrap').style.display  = 'block';
+    document.getElementById('tableCount').textContent   = `${sorted.length} registration${sorted.length !== 1 ? 's' : ''}`;
+
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = sorted.map((r, i) => {
+      const date = r.registeredAt
+        ? new Date(r.registeredAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+        : '—';
+      const payment = r.paymentImageUrl
+        ? `<a class="payment-img" href="${r.paymentImageUrl}" target="_blank">📷 View</a>`
+        : r.transactionId
+          ? `<span style="color:var(--gold);font-size:0.78rem">${r.transactionId}</span>`
+          : `<span class="no-payment">Not provided</span>`;
+
+      return `<tr>
+        <td><span class="reg-id">${r.regId || '—'}</span></td>
+        <td><div class="td-name">${escHtml(r.teamName || '—')}</div></td>
+        <td style="max-width:180px;font-size:0.82rem">${escHtml(r.projectTitle || '—')}</td>
+        <td><span class="badge badge-domain">${escHtml(r.domain || '—')}</span></td>
+        <td style="font-size:0.82rem;max-width:150px">${escHtml(r.college || '—')}</td>
+        <td>
+          <div class="td-name" style="font-size:0.85rem">${escHtml(r.leader?.name || '—')}</div>
+          <div class="td-email">${escHtml(r.leader?.email || '')}</div>
+          <div class="td-phone">${escHtml(r.leader?.phone || '')}</div>
+        </td>
+        <td><span class="badge badge-members">👤 ${r.totalMembers || '—'}</span></td>
+        <td>${payment}</td>
+        <td><div class="date-cell">${date}</div></td>
+        <td><button class="btn-view" onclick="showDetail(${i})">View ↗</button></td>
+      </tr>`;
+    }).join('');
+
+    // Store sorted for modal reference
+    window._sortedRegs = sorted;
+  }
+
+  // DETAIL MODAL
+  window.showDetail = function(idx) {
+    const r = window._sortedRegs[idx];
+    if (!r) return;
+    const date = r.registeredAt
+      ? new Date(r.registeredAt).toLocaleString('en-IN', { dateStyle: 'long', timeStyle: 'short' })
+      : '—';
+    const members = (r.members || []).map(m => `
+      <div class="member-card">
+        <div class="member-card-name">${escHtml(m.name || '—')}</div>
+        <div class="member-card-details">
+          ${m.email ? `📧 ${escHtml(m.email)}` : ''}
+          ${m.phone ? ` &nbsp;·&nbsp; 📱 ${escHtml(m.phone)}` : ''}
+          ${m.year  ? ` &nbsp;·&nbsp; 🎓 ${escHtml(m.year)}` : ''}
+        </div>
+      </div>`).join('');
+
+    document.getElementById('modalContent').innerHTML = `
+      <div class="modal-reg-id">${r.regId || '—'}</div>
+      <div class="modal-title">${escHtml(r.teamName || '—')}</div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-top:0.25rem">${escHtml(r.projectTitle || '')}</p>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Team Info</div>
+        <div class="detail-grid">
+          <div class="detail-item"><label>Domain</label><span>${escHtml(r.domain || '—')}</span></div>
+          <div class="detail-item"><label>College</label><span>${escHtml(r.college || '—')}</span></div>
+          <div class="detail-item"><label>Department</label><span>${escHtml(r.department || '—')}</span></div>
+          <div class="detail-item"><label>Total Members</label><span>${r.totalMembers || '—'}</span></div>
+          <div class="detail-item"><label>Registered On</label><span>${date}</span></div>
+          <div class="detail-item"><label>Transaction ID</label><span>${escHtml(r.transactionId || 'Not provided')}</span></div>
+        </div>
+        ${r.paymentImageUrl ? `<div style="margin-top:1rem"><a class="payment-img" href="${r.paymentImageUrl}" target="_blank">📷 View Payment Screenshot</a></div>` : ''}
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Team Leader</div>
+        <div class="member-card">
+          <div class="member-card-name">⭐ ${escHtml(r.leader?.name || '—')}</div>
+          <div class="member-card-details">
+            ${r.leader?.email ? `📧 ${escHtml(r.leader.email)}` : ''}
+            ${r.leader?.phone ? ` &nbsp;·&nbsp; 📱 ${escHtml(r.leader.phone)}` : ''}
+            ${r.leader?.year  ? ` &nbsp;·&nbsp; 🎓 ${escHtml(r.leader.year)}` : ''}
+          </div>
+        </div>
+      </div>
+
+      ${members ? `<div class="modal-section">
+        <div class="modal-section-title">Team Members</div>
+        ${members}
+      </div>` : ''}
+    `;
+    document.getElementById('detailModal').classList.add('show');
+  };
+
+  window.closeModal = function() {
+    document.getElementById('detailModal').classList.remove('show');
+  };
+  document.getElementById('detailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // EXPORT CSV
+  window.exportCSV = function() {
+    const regs = window._sortedRegs || allRegistrations;
+    if (!regs.length) return alert('No data to export.');
+
+    const headers = ['Reg ID','Team Name','Project Title','Domain','College','Department',
+      'Leader Name','Leader Email','Leader Phone','Leader Year',
+      'Member 2','Member 3','Member 4','Member 5',
+      'Total Members','Transaction ID','Registered At'];
+
+    const rows = regs.map(r => {
+      const members = r.members || [];
+      return [
+        r.regId, r.teamName, r.projectTitle, r.domain, r.college, r.department,
+        r.leader?.name, r.leader?.email, r.leader?.phone, r.leader?.year,
+        members[0]?.name, members[1]?.name, members[2]?.name, members[3]?.name,
+        r.totalMembers, r.transactionId,
+        r.registeredAt ? new Date(r.registeredAt).toLocaleString('en-IN') : ''
+      ].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`);
+    });
+
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = `veda_registrations_${Date.now()}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  };
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
